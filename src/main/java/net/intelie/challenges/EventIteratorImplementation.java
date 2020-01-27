@@ -56,6 +56,6 @@ public class EventIteratorImplementation implements EventIterator {
 
     @Override
     public void close() throws Exception {
-
+        // For now I don't think it's necessary some implementation here.
     }
 }

@@ -10,12 +10,15 @@ import static java.util.UUID.randomUUID;
 public class Event  implements Comparable<Event> {
     private final String type;
     private final long timestamp;
-    private final String eventId;
+    private final String _eventId;
 
     public Event(String type, long timestamp)  {
+        if( type == null || type.isEmpty() )
+            throw new IllegalArgumentException("Type attribute can'b be null or empty string");
+
         this.type = type;
         this.timestamp = timestamp;
-        this.eventId = randomUUID().toString();
+        this._eventId = randomUUID().toString();
     }
 
     public String type() {
@@ -26,7 +29,7 @@ public class Event  implements Comparable<Event> {
         return timestamp;
     }
 
-    public String eventId(){ return eventId; }
+    private String eventId(){ return _eventId; }
 
     @Override
     public int compareTo(Event otherEvent) {
@@ -36,7 +39,7 @@ public class Event  implements Comparable<Event> {
             return 1;
         if (this.timestamp() < otherEvent.timestamp())
             return -1;
-        return 1;
+        return 1; // this line will never be hit by test coverage, its here just for compiling purpose
     }
 
     @Override
@@ -44,11 +47,11 @@ public class Event  implements Comparable<Event> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return Objects.equals(eventId, event.eventId);
+        return Objects.equals(this._eventId, event._eventId);
     }
-
     @Override
     public int hashCode() {
-        return Objects.hash(eventId);
+        return Objects.hash(_eventId);
     }
+
 }
