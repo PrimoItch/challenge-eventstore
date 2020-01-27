@@ -1,6 +1,7 @@
 package net.intelie.challenges;
 
 import java.util.Iterator;
+import java.util.NavigableSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 
@@ -30,6 +31,12 @@ public class EventStoreImplementation implements EventStore {
 
     @Override
     public EventIterator query(String type, long startTime, long endTime) {
-        return null;
+        Event startEvent = new Event("any_type", startTime);
+        Event endEvent = new Event("any_type", endTime);
+        endEvent = _concurrentSkipListSet.ceiling(endEvent);
+        startEvent = _concurrentSkipListSet.floor(startEvent);
+        NavigableSet<Event> navegaleSet = _concurrentSkipListSet.subSet(startEvent, endEvent);
+        return new EventIteratorImplementation(type, navegaleSet);
+
     }
 }

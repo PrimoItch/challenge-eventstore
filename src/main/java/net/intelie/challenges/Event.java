@@ -1,6 +1,6 @@
 package net.intelie.challenges;
 
-import java.util.Comparator;
+import java.util.Objects;
 
 import static java.util.UUID.randomUUID;
 
@@ -37,5 +37,18 @@ public class Event  implements Comparable<Event> {
         if (this.timestamp() < otherEvent.timestamp())
             return -1;
         return 1;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return Objects.equals(eventId, event.eventId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(eventId);
     }
 }
