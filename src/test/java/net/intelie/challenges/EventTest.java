@@ -2,6 +2,12 @@ package net.intelie.challenges;
 
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentSkipListSet;
+
 import static org.junit.Assert.assertEquals;
 
 public class EventTest {
@@ -14,4 +20,5 @@ public class EventTest {
         assertEquals(123L, event.timestamp());
         assertEquals("some_type", event.type());
     }
+
 }
