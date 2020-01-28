@@ -30,13 +30,34 @@ public class EventStoreImplementation implements EventStore {
     }
 
     @Override
-    public EventIterator query(String type, long startTime, long endTime) {
+    public EventIterator query(String type, long startTime, long endTime) throws IllegalArgumentException {
+        if(startTime > endTime)
+            throw new IllegalArgumentException("startTime time should be smaller then endTime");
+
+        if(_concurrentSkipListSet.isEmpty())
+            return getEmptyEventIterator(type, startTime, endTime);
+
         Event startEvent = new Event("any_type", startTime);
         Event endEvent = new Event("any_type", endTime);
         endEvent = _concurrentSkipListSet.ceiling(endEvent);
-        startEvent = _concurrentSkipListSet.floor(startEvent);
-        NavigableSet<Event> navegaleSet = _concurrentSkipListSet.subSet(startEvent, endEvent);
-        return new EventIteratorImplementation(type, navegaleSet);
+        if(endEvent == null)
+            //There is no such grater or equal timestamp, so get the newest event.
+            endEvent = _concurrentSkipListSet.last();
 
+        startEvent = _concurrentSkipListSet.floor(startEvent);
+        if(startEvent == null)
+            //There is no such smaller or equal timestamp, so get the oldest event.
+            startEvent = _concurrentSkipListSet.first();
+
+        NavigableSet<Event> navigableSet =
+                _concurrentSkipListSet.subSet(startEvent, true, endEvent, true);
+        return new EventIteratorImplementation(type, navigableSet, startTime, endTime);
+    }
+
+    private EventIteratorImplementation getEmptyEventIterator(String type, long startTime, long endTime) {
+        return new EventIteratorImplementation(type,
+                _concurrentSkipListSet.headSet(new Event(type, startTime))
+                , startTime,
+                endTime);
     }
 }

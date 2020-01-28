@@ -6,17 +6,22 @@ import java.util.NavigableSet;
 public class EventIteratorImplementation implements EventIterator {
 
     private final Iterator<Event> _interator;
+    private long startTime;
+    private long endTime;
     private final String _type;
     private final NavigableSet<Event> _navigableSet;
     private Event _currentEvent;
     private boolean _hasCalledMoveNext = false;
     private boolean _hasNext = false;
 
-    public EventIteratorImplementation(String type, NavigableSet<Event> navigableSet)
+    public EventIteratorImplementation(String type, NavigableSet<Event> navigableSet,
+                                       long startTime, long endTime)
     {
         _type = type;
         _navigableSet = navigableSet;
         _interator = navigableSet.iterator();
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     @Override
@@ -26,6 +31,9 @@ public class EventIteratorImplementation implements EventIterator {
         while (_interator.hasNext())
         {
             _currentEvent = _interator.next();
+            if(_currentEvent.timestamp() < startTime || _currentEvent.timestamp() > endTime)
+                continue;
+
             if(_currentEvent.type().equals(_type)){
                 _hasNext = true;
                 return true;
