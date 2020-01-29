@@ -45,7 +45,7 @@ public class EventTest {
     }
 
     @Test
-    public void passEmptyStringForTypeShouldThrowIllegalArgumentException()  {
+    public void passEmptyStringForTypeShouldNotThrowIllegalArgumentException()  {
         // Arrange
         boolean throwIllegalArgumentException = false;
         try
@@ -59,7 +59,7 @@ public class EventTest {
         }
 
         //Assert
-        assertTrue(throwIllegalArgumentException);
+        assertFalse(throwIllegalArgumentException);
     }
 
     /*
@@ -138,7 +138,7 @@ public class EventTest {
     }
 
     @Test
-    public void eventWithSameTimestampIsConsideredBigger()  {
+    public void eventWithSameTimestampIsConsideredEquals()  {
 
         // Arrange
         Event event_one = new Event("some_type", 1L);
@@ -148,7 +148,7 @@ public class EventTest {
         int eventOneOrder = event_one.compareTo(event_two);
 
         // Assert
-        assertTrue(eventOneOrder == 1);
+        assertTrue(eventOneOrder == 0);
     }
 
     @Test

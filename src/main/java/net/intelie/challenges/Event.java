@@ -1,8 +1,5 @@
 package net.intelie.challenges;
 
-import java.util.Objects;
-
-import static java.util.UUID.randomUUID;
 
 /**
  * This is just an event stub, feel free to expand it if needed.
@@ -10,48 +7,54 @@ import static java.util.UUID.randomUUID;
 public class Event  implements Comparable<Event> {
     private final String type;
     private final long timestamp;
-    private final String _eventId;
 
+    /**
+     * Instantiate an event. It needs to have a not null type
+     * and a timestamp.
+     *
+     * @param type      The event type.
+     * @param timestamp The {@param event } timestamp when it occurred.
+     */
     public Event(String type, long timestamp)  {
-        if( type == null || type.isEmpty() )
-            throw new IllegalArgumentException("Type attribute can'b be null or empty string");
+        if( type == null )
+            throw new IllegalArgumentException("Type attribute can'b be null");
 
         this.type = type;
         this.timestamp = timestamp;
-        this._eventId = randomUUID().toString();
     }
 
+    /**
+     * Returns the event type
+     * @return The {@param event} type
+     */
     public String type() {
         return type;
     }
 
+    /**
+     * The event timestamp.
+     * @return the event {@param timestamp }.
+     */
     public long timestamp() {
         return timestamp;
     }
 
-    private String eventId(){ return _eventId; }
-
+    /**
+     * The Comparable interface implementations.
+     * Compare two events according to their timestamp.
+     * Early events are considered "smaller" then older events.
+     *
+     * @param otherEvent Another event to be compared.
+     * @return 1 if this event is older
+     *         -1 if this event is earlier
+     *         0 if both events has the same timestamp
+     */
     @Override
     public int compareTo(Event otherEvent) {
-        if(this.eventId().equals(otherEvent.eventId()))
-            return 0;
-        if (this.timestamp() >= otherEvent.timestamp())
+        if (this.timestamp() > otherEvent.timestamp())
             return 1;
         if (this.timestamp() < otherEvent.timestamp())
             return -1;
-        return 1; // this line will never be hit by test coverage, its here just for compiling purpose
+        return 0;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Event event = (Event) o;
-        return Objects.equals(this._eventId, event._eventId);
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(_eventId);
-    }
-
 }

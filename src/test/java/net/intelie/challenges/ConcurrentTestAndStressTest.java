@@ -2,15 +2,18 @@ package net.intelie.challenges;
 
 import org.junit.Test;
 
+import java.sql.Time;
+import java.time.DateTimeException;
 import java.util.Calendar;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
- * This tests are intended to demostrate the concurrent
- * capability of the implementation as well the
- * some stress test.
+ * This tests are intended to demonstrate the concurrent
+ * capability of the implementation.
+ *
+ *
  */
 public class ConcurrentTestAndStressTest {
 
@@ -23,16 +26,21 @@ public class ConcurrentTestAndStressTest {
         calendar.add(Calendar.HOUR, 1);
         long maxTimestamp = calendar.getTimeInMillis();
 
-        EventConusmer conusmer = new EventConusmer(eventStore, minTimestamp, maxTimestamp);
-        EventInserter inserter = new EventInserter(eventStore, minTimestamp, maxTimestamp);
+        long delayOnConsuming = 10L;
+        long delayOnInserting = 5L;
 
-        conusmer.start();
+        EventConusmer consumer = new EventConusmer(eventStore, minTimestamp, maxTimestamp, delayOnConsuming);
+        EventInserter inserter = new EventInserter(eventStore, minTimestamp, maxTimestamp, delayOnInserting);
 
-        while (true)
-        {
-            Thread.sleep(100);
+        Thread consumerThread = consumer.start();
+        Thread inserterThread = inserter.start();
 
-        }
+        Thread.sleep(60*100);
+
+        consumerThread.interrupt();
+        inserterThread.interrupt();
+
+        Thread.sleep(100);
     }
 }
 

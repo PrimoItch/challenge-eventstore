@@ -5,35 +5,45 @@ import java.util.NavigableSet;
 
 public class EventIteratorImplementation implements EventIterator {
 
-    private final Iterator<Event> _interator;
-    private long startTime;
-    private long endTime;
-    private final String _type;
+
+     //  Sub set of the ConcurrentSkipListSet
     private final NavigableSet<Event> _navigableSet;
-    private Event _currentEvent;
-    private boolean _hasCalledMoveNext = false;
+
+
+     // The Iterator of the sub set of the ConcurrentSkipListSet
+    private final Iterator<Event> _iterator;
+
+    //The event type
+    private final String _type;
+
+     //The Current Event
+     private Event _currentEvent;
+
+     //Flag to indicate that method moveNext was called
+     private boolean _hasCalledMoveNext = false;
+
+    //Flag to indicate if there is a new element to be read
     private boolean _hasNext = false;
 
-    public EventIteratorImplementation(String type, NavigableSet<Event> navigableSet,
-                                       long startTime, long endTime)
+    /**
+     * Create an EventIterator.
+     * @param type The event type.
+     * @param navigableSet A sub set of the ConcurrentSkipListSet
+     */
+    public EventIteratorImplementation(String type, NavigableSet<Event> navigableSet)
     {
         _type = type;
         _navigableSet = navigableSet;
-        _interator = navigableSet.iterator();
-        this.startTime = startTime;
-        this.endTime = endTime;
+        _iterator = navigableSet.iterator();
     }
 
     @Override
     public boolean moveNext() {
         _hasCalledMoveNext = true;
         _hasNext = false;
-        while (_interator.hasNext())
+        while (_iterator.hasNext())
         {
-            _currentEvent = _interator.next();
-            if(_currentEvent.timestamp() < startTime || _currentEvent.timestamp() > endTime)
-                continue;
-
+            _currentEvent = _iterator.next();
             if(_currentEvent.type().equals(_type)){
                 _hasNext = true;
                 return true;

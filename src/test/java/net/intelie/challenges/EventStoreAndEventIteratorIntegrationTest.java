@@ -15,7 +15,7 @@ public class EventStoreAndEventIteratorIntegrationTest {
      */
 
     @Test
-    public void testAddOneNotNullEvent(){
+    public void test_AddOneNotNullEventShouldNotThrowAndException(){
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
         Event eventOne = new Event("type-1", 1L);
@@ -32,7 +32,7 @@ public class EventStoreAndEventIteratorIntegrationTest {
     }
 
     @Test
-    public void testAddOneNullEvent(){
+    public void test_AddOneNullEventShouldThrowNullPointerException(){
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
         boolean throwNullPointerException = false;
@@ -51,12 +51,16 @@ public class EventStoreAndEventIteratorIntegrationTest {
      * removeAll Tests
      */
     @Test
-    public void testRemoveOneEventFromEventStore(){
+    public void test_RemoveOneEventFromEventStore(){
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
-        Event event = new Event("type", 1L);
-        eventStore.insert(event);
-        EventIterator query = eventStore.query("type",1,1);
+        Event event1 = new Event("type", 1L);
+        Event event2 = new Event("type", 2L);
+
+        eventStore.insert(event1);
+        eventStore.insert(event2);
+
+        EventIterator query = eventStore.query("type",1,3);
         if(query.moveNext())
         {
             Event currentEvent = query.current();
@@ -68,33 +72,38 @@ public class EventStoreAndEventIteratorIntegrationTest {
             fail();
         }
 
-        query = eventStore.query("type",1,1);
+        query = eventStore.query("type",1,3);
         boolean hasNext = query.moveNext();
 
         // Assert
-        assertFalse(hasNext);
+        assertTrue(hasNext);
+        assertTrue(query.current().equals(event2));
     }
 
     @Test
-    public void testRemoveEventOfOneTypeFromEventStore(){
+    public void test_RemoveEventOfOneTypeFromEventStore(){
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
         Event event1 = new Event("type1", 1L);
-        Event event2 = new Event("type2", 2L);
+        Event event2 = new Event("type1", 2L);
+        Event event3 = new Event("type2", 3L);
         eventStore.insert(event1);
         eventStore.insert(event2);
+        eventStore.insert(event3);
 
         //Act
         eventStore.removeAll("type1");
 
-        EventIterator query = eventStore.query("type2",1,2);
+        EventIterator query = eventStore.query("type2",3,4);
         boolean hasNext = query.moveNext();
         Event currentEvent = query.current();
 
         // Assert
         if(hasNext)
         {
-            assertEquals(event2, currentEvent);
+            assertEquals(event3, currentEvent);
+            hasNext = query.moveNext();
+            assertFalse(hasNext);
         }
         else
         {
@@ -103,16 +112,17 @@ public class EventStoreAndEventIteratorIntegrationTest {
     }
 
     @Test
-    public void testRemoveEventOfOneNonExistentTypeFromEventStore() throws IllegalStateException{
+    public void test_RemoveEventOfOneNonExistentTypeFromEventStore() throws IllegalStateException{
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
         Event event1 = new Event("type1", 1L);
+
         eventStore.insert(event1);
         boolean hasThrowIllegalStateException = false;
 
         //Act
         eventStore.removeAll("type2");
-        EventIterator query = eventStore.query("type1",1,1);
+        EventIterator query = eventStore.query("type1",1,2);
         boolean hasNext = query.moveNext();
 
         // Assert
@@ -120,9 +130,28 @@ public class EventStoreAndEventIteratorIntegrationTest {
         assertTrue(event1.equals(query.current()));
     }
 
+    @Test
+    public void test_iteratorShouldBeStartTimeInclusiveAndEndTimeExclusive() {
+        // Arrange
+        EventStore eventStore = new EventStoreImplementation();
+        Event event1 = new Event("type1", 1L);
+        Event event2 = new Event("type1", 2L);
+
+        eventStore.insert(event1);
+        eventStore.insert(event2);
+
+        //Act
+        EventIterator query = eventStore.query("type1",1,2);
+        boolean hasNext = query.moveNext();
+
+        // Assert
+        assertTrue(query.current().equals(event1));
+        hasNext = query.moveNext();
+        assertFalse(hasNext);
+    }
 
     @Test
-    public void iteratorWithStartTimeSmallerThenGraterTimeThrowsIllegalArgumentException() {
+    public void test_iteratorWithStartTimeSmallerThenGraterTimeThrowsIllegalArgumentException() {
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
         boolean throwIllegalArgumentException = false;
@@ -140,7 +169,7 @@ public class EventStoreAndEventIteratorIntegrationTest {
 
 
     @Test
-    public void testInsertFourEventsAndIterateAmongThen() {
+    public void test_insertFourEventsAndIterateAmongThen() {
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
 
@@ -155,7 +184,7 @@ public class EventStoreAndEventIteratorIntegrationTest {
         eventStore.insert(event_4);
 
         // Assert
-        EventIterator iterator = eventStore.query("type-1", 2, 3);
+        EventIterator iterator = eventStore.query("type-1", 2, 4);
 
         boolean hasNext;
 
@@ -172,7 +201,7 @@ public class EventStoreAndEventIteratorIntegrationTest {
     }
 
     @Test
-    public void callCurrentWithoutCallMoveNextShouldThrowIllegalStateException() {
+    public void test_callCurrentWithoutCallMoveNextShouldThrowIllegalStateException() {
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
         boolean throwIllegalStateException = false;
@@ -190,7 +219,7 @@ public class EventStoreAndEventIteratorIntegrationTest {
     }
 
     @Test
-    public void callCurrentWhenMoveNextReturnedFalseShouldThrowIllegalStateException() {
+    public void test_callCurrentWhenMoveNextReturnedFalseShouldThrowIllegalStateException() {
         // Arrange
         EventStore eventStore = new EventStoreImplementation();
         boolean throwIllegalStateException = false;

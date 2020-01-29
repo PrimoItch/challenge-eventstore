@@ -3,10 +3,11 @@ package net.intelie.challenges;
 import java.util.Random;
 
 public class EventConusmer implements Runnable {
-    private final Random randon;
+    private final Random random;
     private EventStore eventStore;
     private long minTimestamp;
     private long maxTimestamp;
+    private long delay;
 
     /**
      *
@@ -14,12 +15,14 @@ public class EventConusmer implements Runnable {
      * @param minTimestamp
      * @param maxTimestamp
      */
-    public EventConusmer(EventStore eventStore, long minTimestamp, long maxTimestamp){
+    public EventConusmer(EventStore eventStore, long minTimestamp, long maxTimestamp,
+                         long delay) {
 
         this.eventStore = eventStore;
         this.minTimestamp = minTimestamp;
         this.maxTimestamp = maxTimestamp;
-        this.randon = new Random();
+        this.delay = delay;
+        this.random = new Random();
     }
     @Override
     public void run() {
@@ -34,21 +37,30 @@ public class EventConusmer implements Runnable {
                 numberTwo = numberOne;
             }
 
-            String type = randon.nextBoolean() == true ? "typeOne" : "typeTwo";
+            String type = random.nextBoolean() == true ? "typeOne" : "typeTwo";
 
             EventIterator iterator = eventStore.query(type, numberOne, numberTwo);
 
+            if(random.nextFloat() < 0.001F)
+                eventStore.removeAll(type);
+
             while (iterator.moveNext())
             {
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 Event event = iterator.current();
-                if(randon.nextBoolean())
+                if(random.nextBoolean())
                     iterator.remove();
             }
         }
     }
 
-    public void start(){
+    public Thread start(){
         Thread thread = new Thread(this, "consumer thread");
         thread.start();
+        return thread;
     }
 }
