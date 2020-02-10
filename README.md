@@ -1,3 +1,9 @@
+This is my solution to the challenge-eventstore.
+
+You will find all the documentation and the justifications in the code. 
+
+# =======================================================================
+
 # Implement EventStore
 
 In this challenge, you will create a class that implements the `EventStore` 
