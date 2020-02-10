@@ -2,8 +2,6 @@ package net.intelie.challenges;
 
 import org.junit.Test;
 
-import java.sql.Time;
-import java.time.DateTimeException;
 import java.util.Calendar;
 
 import static org.junit.Assert.assertTrue;
@@ -17,6 +15,17 @@ import static org.junit.Assert.fail;
  */
 public class ConcurrentTestAndStressTest {
 
+    /**
+     * This test create two  entities: one that insert data to the Evenet Store
+     * and one that reads it.
+     * They live in two separate threads that are active on the same time, reading
+     * and adding events to the event store.
+     *
+     * Despite it's not a real test, because it doesn't have an assert step, but it
+     * serve us to demonstrate the code ability to deal with concurrent access to the
+     * event store.
+     *
+     */
     @Test
     public void concurrentTestAddAndInsert() throws InterruptedException {
 
@@ -29,7 +38,7 @@ public class ConcurrentTestAndStressTest {
         long delayOnConsuming = 10L;
         long delayOnInserting = 5L;
 
-        EventConusmer consumer = new EventConusmer(eventStore, minTimestamp, maxTimestamp, delayOnConsuming);
+        EventConsumer consumer = new EventConsumer(eventStore, minTimestamp, maxTimestamp, delayOnConsuming);
         EventInserter inserter = new EventInserter(eventStore, minTimestamp, maxTimestamp, delayOnInserting);
 
         Thread consumerThread = consumer.start();

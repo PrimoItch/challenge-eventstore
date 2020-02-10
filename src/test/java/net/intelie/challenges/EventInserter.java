@@ -2,6 +2,11 @@ package net.intelie.challenges;
 
 import java.util.Random;
 
+/**
+ * This class represents an entity that inset events in the event store.
+ * It insert two of possible events: typeOne or typeTwo in a random
+ * timestamp between maxTimestamp and minTimestamp provided in the constructor.
+ */
 public class EventInserter implements Runnable {
 
     private final Random random;

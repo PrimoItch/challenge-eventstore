@@ -2,7 +2,14 @@ package net.intelie.challenges;
 
 import java.util.Random;
 
-public class EventConusmer implements Runnable {
+/**
+ * This class represents an entity that consumes the events that are
+ * stored.
+ * It makes queries, read the iterator, remove the element from the iterator
+ * with a 50% of probability and remove all elements from the
+ * eventStore with a 0.1% of probability
+ */
+public class EventConsumer implements Runnable {
     private final Random random;
     private EventStore eventStore;
     private long minTimestamp;
@@ -15,7 +22,7 @@ public class EventConusmer implements Runnable {
      * @param minTimestamp
      * @param maxTimestamp
      */
-    public EventConusmer(EventStore eventStore, long minTimestamp, long maxTimestamp,
+    public EventConsumer(EventStore eventStore, long minTimestamp, long maxTimestamp,
                          long delay) {
 
         this.eventStore = eventStore;
